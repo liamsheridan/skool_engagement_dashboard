@@ -6,7 +6,6 @@ import openpyxl
 from datetime import datetime, timedelta
 from skool_community_posts import scrape_community_data
 from io import BytesIO
-import tempfile
 import os
 from PIL import Image
 import matplotlib.pyplot as plt
