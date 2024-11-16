@@ -243,4 +243,6 @@ def scrape_community_data(community_url, community_owner):
     if driver:
         scraped_data = scrape_community_posts(driver, community_url)
         driver.quit()
-        return scraped_data  # Return scraped data
+        return scraped_data
+    else:
+        return None

@@ -23,13 +23,33 @@ if st.sidebar.button("Scrape Data"):
             scraped_data = scrape_community_data(
                 community_url, community_owner)
             if scraped_data:
-                # Load data from BytesIO object directly into DataFrame
                 df = pd.read_csv(scraped_data)
                 st.success("Data scraping completed successfully.")
             else:
                 st.error("Data scraping failed or no data was collected.")
+                df = None
     else:
         st.error("Please enter both Community URL and Community Owner Name.")
+        df = None
+else:
+    # Load data from CSV file
+    try:
+        df = pd.read_csv("community_posts.csv")
+    except FileNotFoundError:
+        st.error(
+            "CSV file not found. Please ensure the scraping script has run successfully."
+        )
+        df = None
+
+# Only proceed if df is defined
+if df is not None:
+    # Convert Post Date to datetime
+    try:
+        df['Post Date'] = pd.to_datetime(df['Post Date'], format="%d/%m/%Y")
+    except Exception as e:
+        st.error(f"Error converting Post Date: {e}")
+else:
+    st.stop()  # Stop execution if no valid data is available
 
 
 # Convert Post Date to datetime
