@@ -16,18 +16,17 @@ community_url = st.sidebar.text_input("Enter Community URL:")
 community_owner = st.sidebar.text_input(
     "Enter Community Owner Name:", key='community_owner')
 
+# Updated to work with BytesIO data returned from scraper
 if st.sidebar.button("Scrape Data"):
     if community_url and community_owner:
         with st.spinner("Scraping data, please wait..."):
-            scrape_community_data(community_url, community_owner)
-            st.success("Data scraping completed successfully.")
-        # Reload data from CSV after scraping
-        try:
-            df = pd.read_csv("community_posts.csv")
-        except FileNotFoundError:
-            st.error(
-                "CSV file not found. Please ensure the scraping script has run successfully.")
-            st.stop()
+            scraped_data = scrape_community_data(
+                community_url, community_owner)
+            if scraped_data:
+                df = pd.read_csv(scraped_data)
+                st.success("Data scraping completed successfully.")
+            else:
+                st.error("Data scraping failed or no data was collected.")
     else:
         st.error("Please enter both Community URL and Community Owner Name.")
 
