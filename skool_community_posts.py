@@ -35,8 +35,13 @@ def login_and_get_driver():
     try:
         print("Logging into Skool using Selenium... Please wait.")
         options = webdriver.ChromeOptions()
-        # Uncomment the line below if running on a server without GUI
-        # options.add_argument('--headless')
+        # Enable headless mode for deployment
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument(
+            "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+
         driver = webdriver.Chrome(service=Service(
             ChromeDriverManager().install()), options=options)
 
@@ -44,7 +49,7 @@ def login_and_get_driver():
 
         driver.get("https://www.skool.com/login")
 
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.ID, "email")))
 
         print("Login page loaded successfully.")
@@ -57,24 +62,10 @@ def login_and_get_driver():
 
         print("Login form submitted.")
 
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CLASS_NAME, "styled__PostItemWrapper-sc-e4ns84-7")))
 
         print("Successfully logged in.")
-
-        cookies = driver.get_cookies()
-        print(f"Captured Cookies: {cookies}")
-
-        # Extract auth token from cookies
-        auth_token = next(
-            (cookie["value"]
-             for cookie in cookies if cookie["name"] == "auth_token"), None
-        )
-
-        if not auth_token:
-            raise Exception("Auth token not found in cookies.")
-
-        print(f"Auth token retrieved: {auth_token}")
         return driver  # Return the WebDriver instance for further use
 
     except TimeoutException:
