@@ -11,7 +11,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from datetime import datetime, timedelta
 from pathlib import Path
-from io import BytesIO
+import re
 
 
 def login_and_get_driver():
@@ -35,16 +35,6 @@ def login_and_get_driver():
     try:
         print("Logging into Skool using Selenium... Please wait.")
         options = webdriver.ChromeOptions()
-        options.add_argument('--headless')  # Run Chrome in headless mode
-        # Required for some environments like Docker
-        options.add_argument('--no-sandbox')
-        # Overcome limited resource problems
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('window-size=1920x1080')
-        options.add_argument(
-            "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-        options.binary_location = "/usr/bin/chromium-browser"
-        options.add_argument("user-agent=Your custom user agent string")
 
         driver = webdriver.Chrome(service=Service(
             ChromeDriverManager().install()), options=options)
@@ -249,24 +239,23 @@ def scrape_community_posts(driver, community_url):
     except Exception as e:
         print(f"An error occurred while scraping: {e}")
     finally:
-        # Store scraped data in a DataFrame and keep it in memory
+        # Store scraped data in a DataFrame and save it to CSV
         if posts_data:
             df = pd.DataFrame(posts_data)
             remove_duplicates(df)  # Remove duplicates from the DataFrame
 
-            # Save to in-memory storage
-            output = BytesIO()
-            df.to_csv(output, index=False)
-            # Move the pointer to the start of the file-like object
-            output.seek(0)
-            print("Data scraped and stored in memory.")
-            return output  # Return the in-memory file-like object
+            # Extract community identifier from the URL
+            community_identifier = re.sub(
+                r'https://www\.skool\.com/', '', community_url).replace('/', '_')
+            output_file = f"scraped_community_posts_{community_identifier}.csv"
+
+            # Save DataFrame to CSV file
+            df.to_csv(output_file, index=False)
+            print(f"Data scraped and saved to {output_file}.")
+            return output_file  # Return the path to the saved CSV file
         else:
             print("No data collected, CSV not saved.")
             return None
-
-
-# Updated function to be used with Streamlit app
 
 
 def scrape_community_data(community_url, community_owner):
