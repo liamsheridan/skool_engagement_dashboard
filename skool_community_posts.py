@@ -11,6 +11,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from datetime import datetime, timedelta
 from pathlib import Path
+from io import BytesIO
 
 
 def login_and_get_driver():
@@ -218,17 +219,24 @@ def scrape_community_posts(driver, community_url):
     except Exception as e:
         print(f"An error occurred while scraping: {e}")
     finally:
-        # Store scraped data in a DataFrame and export to CSV
+        # Store scraped data in a DataFrame and keep it in memory
         if posts_data:
             df = pd.DataFrame(posts_data)
             remove_duplicates(df)  # Remove duplicates from the DataFrame
-            df.to_csv("community_posts.csv", index=False)
-            print("Data scraped and saved to community_posts.csv")
+
+            # Save to in-memory storage
+            output = BytesIO()
+            df.to_csv(output, index=False)
+            # Move the pointer to the start of the file-like object
+            output.seek(0)
+            print("Data scraped and stored in memory.")
+            return output  # Return the in-memory file-like object
         else:
             print("No data collected, CSV not saved.")
-
+            return None
 
 # Updated function to be used with Streamlit app
+
 
 def scrape_community_data(community_url, community_owner):
     driver = login_and_get_driver()
