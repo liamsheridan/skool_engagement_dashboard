@@ -35,12 +35,16 @@ def login_and_get_driver():
     try:
         print("Logging into Skool using Selenium... Please wait.")
         options = webdriver.ChromeOptions()
-        # Enable headless mode for deployment
-        options.add_argument('--headless')
+        options.add_argument('--headless')  # Run Chrome in headless mode
+        # Required for some environments like Docker
         options.add_argument('--no-sandbox')
+        # Overcome limited resource problems
         options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('window-size=1920x1080')
         options.add_argument(
             "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+        options.binary_location = "/usr/bin/chromium-browser"
+        options.add_argument("user-agent=Your custom user agent string")
 
         driver = webdriver.Chrome(service=Service(
             ChromeDriverManager().install()), options=options)
@@ -49,7 +53,7 @@ def login_and_get_driver():
 
         driver.get("https://www.skool.com/login")
 
-        WebDriverWait(driver, 30).until(
+        WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.ID, "email")))
 
         print("Login page loaded successfully.")
@@ -62,10 +66,24 @@ def login_and_get_driver():
 
         print("Login form submitted.")
 
-        WebDriverWait(driver, 30).until(
+        WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.CLASS_NAME, "styled__PostItemWrapper-sc-e4ns84-7")))
 
         print("Successfully logged in.")
+
+        cookies = driver.get_cookies()
+        print(f"Captured Cookies: {cookies}")
+
+        # Extract auth token from cookies
+        auth_token = next(
+            (cookie["value"]
+             for cookie in cookies if cookie["name"] == "auth_token"), None
+        )
+
+        if not auth_token:
+            raise Exception("Auth token not found in cookies.")
+
+        print(f"Auth token retrieved: {auth_token}")
         return driver  # Return the WebDriver instance for further use
 
     except TimeoutException:
@@ -189,19 +207,40 @@ def scrape_community_posts(driver, community_url):
                 except NoSuchElementException as e:
                     print(f"An element was not found: {e}")
 
-            # Check if there is a next page button and click it, or scroll down to load more
+            # Step 3: Track the number of posts before clicking the next button
+            previous_post_count = len(posts_data)
+            print(f"Number of posts before clicking next: {
+                  previous_post_count}")
+
+            # Step 2: Check if there is a next page button and click it, or scroll down to load more
             try:
                 next_button = driver.find_element(
                     By.XPATH, "//button[contains(@class, 'styled__ButtonWrapper-sc-dscagy-1') and span[text()='Next']]"
                 )
+                print("Next button found. Attempting to click it...")
+
                 # Scroll to the button
                 driver.execute_script(
                     "arguments[0].scrollIntoView();", next_button
                 )
+
+                # Click the button
                 next_button.click()
                 time.sleep(5)  # Allow time for the next page to load
+                print("Next button clicked. Waiting for new content to load...")
+
             except NoSuchElementException:
                 print("No more pages available or pagination ended.")
+                break
+
+            # Step 3: After clicking next, check if new posts were loaded
+            current_post_elements = driver.find_elements(
+                By.XPATH, "//div[contains(@class, 'styled__PostItemWrapper-sc-e4ns84-7')]"
+            )
+            current_post_count = len(current_post_elements)
+
+            if current_post_count == previous_post_count:
+                print("No new posts were loaded. Stopping to avoid infinite loop.")
                 break
 
         # Log collected data to check if data is collected
@@ -225,6 +264,7 @@ def scrape_community_posts(driver, community_url):
         else:
             print("No data collected, CSV not saved.")
             return None
+
 
 # Updated function to be used with Streamlit app
 
