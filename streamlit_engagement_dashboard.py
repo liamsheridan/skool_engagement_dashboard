@@ -198,8 +198,8 @@ def posts_by_time_period(df):
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-# Add Pie Chart for Posts by Owner vs Others
-st.markdown("<div class='chart-container'><h3 style='text-align: center;'>Posts by Owner vs Other Users</h3></div>",
+# Add Pie Chart for Posts by Owner vs Members
+st.markdown("<div class='chart-container'><h3 style='text-align: center;'>Posts by Owner vs Members</h3></div>",
             unsafe_allow_html=True)
 
 owner_name = st.sidebar.text_input("Enter Community Owner Name for Pie Chart:")
@@ -208,18 +208,24 @@ if owner_name and df is not None:
         # Check if the 'Name' column exists
         if 'Name' in df.columns:
             owner_posts_count = df[df['Name'] == owner_name].shape[0]
-            other_posts_count = df[df['Name'] != owner_name].shape[0]
+            members_posts_count = df[df['Name'] != owner_name].shape[0]
 
             # Create data for the pie chart
             pie_data = pd.DataFrame({
-                'User Type': ['Owner', 'Others'],
-                'Count': [owner_posts_count, other_posts_count]
+                'User Type': ['Owner', 'Members'],
+                'Count': [owner_posts_count, members_posts_count]
             })
 
             # Create and display the pie chart
             pie_fig = px.pie(pie_data, values='Count', names='User Type',
                              color_discrete_sequence=px.colors.qualitative.Plotly,
-                             title='Share of Posts by Owner vs Other Users')
+                             title='Share of Posts by Owner vs Members')
+            pie_fig.update_traces(
+                textposition='inside',
+                textinfo='percent+label',
+                textfont_size=18,  # Make percentage text bigger
+                textfont_color='white'  # Set text color to white
+            )
             st.plotly_chart(pie_fig)
         else:
             st.error("The required column 'Name' does not exist in the data.")
