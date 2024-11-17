@@ -437,6 +437,13 @@ with col2:
     users_engagement_leaderboard(df, metric='Likes')
     st.markdown("</div>", unsafe_allow_html=True)
 
+# Add headers again for page 5
+st.markdown("<div class='page-break full-page'>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
+            unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5px;'>Top 20 Members by</h3>",
+            unsafe_allow_html=True)
+
 # Comments and Total Engagement leaderboards side by side
 col3, col4 = st.columns(2)
 
