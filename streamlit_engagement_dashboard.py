@@ -38,11 +38,101 @@ if df is not None:
 
 st.markdown("""
     <style>
+        @media print {
+            h1, h2, h3, h4, h5, h6, p, div, table, thead, tbody, tfoot, tr, th, td {
+                page-break-inside: avoid;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .chart-container {
+                page-break-inside: avoid;
+                page-break-before: auto;
+                page-break-after: auto;
+                margin-bottom: 40px; /* Add some extra spacing for printing */
+            }
+            body {
+                -webkit-print-color-adjust: exact;
+                font-size: 14px; /* Adjust font size for readability in print */
+            }
+            table {
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
         h1 {
-            margin-bottom: 10px !important;  /* Reduce space below the main title */
+            margin-bottom: 10px !important;
+            text-align: center;
+            font-weight: bold;
+            font-size: 28px; /* Larger font for main title */
+        }
+        h2 {
+            text-align: center;
+            font-weight: bold;
+            font-size: 22px;
+            margin-bottom: 5px;
+            margin-top: 30px;
         }
         h3 {
-            margin-top: 0px !important;      /* Reduce space above subheadings */
+            text-align: center;
+            margin-top: 0px !important;
+            margin-bottom: 10px;
+            font-size: 18px; /* Consistent subheading size */
+        }
+        h4.leaderboard-header {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .leaderboard-table {
+            margin-top: 0px;
+            page-break-inside: avoid;
+        }
+        table.custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+        th {
+            background-color: #444;
+            color: white;
+            height: 40px;
+            text-align: center;
+        }
+        td img {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+        }
+        th.rank, td.rank {
+            width: 60px;
+        }
+        th.profile-picture, td.profile-picture {
+            width: 60px;
+        }
+        th.name, td.name {
+            width: 200px;
+        }
+        th.metric, td.metric {
+            width: 50px;
+        }
+        caption {
+            font-size: 2em;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-align: center;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -50,37 +140,6 @@ st.markdown("""
 # Streamlit App
 st.markdown("<h1 style='text-align: center; margin-bottom: -10px;'>Skool Community Post Engagement Dashboard</h1>",
             unsafe_allow_html=True)
-
-# Custom CSS for page formatting and preventing page breaks
-st.markdown("""
-            <style>
-            @media print {
-                h1, h2, h3, h4, h5, h6, p, div, table, thead, tbody, tfoot, tr, th, td {
-                    page-break-inside: avoid;
-                }
-                .page-break {
-                    page-break-before: always;
-                }
-                .chart-container {
-                    page-break-inside: avoid;
-                    page-break-before: auto;
-                    page-break-after: auto;
-                    margin-bottom: 20px;
-                }
-                body {
-                    -webkit-print-color-adjust: exact;
-                    font-size: 16px;
-                }
-            }
-            .leaderboard-header {
-                margin-bottom: -10px;
-                margin-top: 0px;
-            }
-            .leaderboard-table {
-                margin-top: 0px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
 
 # Month Filter
 if df is not None:
@@ -97,29 +156,17 @@ else:
 def posts_by_day(df):
     df['Day'] = df['Post Date'].dt.date
     daily_posts = df.groupby(
-        ['Day', 'Category']).size().reset_index(name='Counts')
-
+        ['Day'], as_index=False).agg({'Category': 'count'}).rename(columns={'Category': 'Counts'})
     st.markdown("<h3 style='text-align: center;'>Posts by Day</h3>",
                 unsafe_allow_html=True)
 
     # Create a pivot table for stacked bar chart
-    daily_pivot = daily_posts.pivot(
-        index=['Day'], columns='Category', values='Counts').fillna(0)
-    daily_pivot.reset_index(inplace=True)
-
-    # Create Plotly figure for stacked bar chart
     fig = go.Figure()
-    color_sequence = px.colors.qualitative.Plotly
-    for i, category in enumerate(daily_pivot.columns[1:]):
-        fig.add_trace(go.Bar(
-            x=daily_pivot['Day'],
-            y=daily_pivot[category],
-            name=category,
-            marker_color=color_sequence[i % len(color_sequence)],
-            hovertext=daily_pivot.apply(
-                lambda row: f"{row['Day']}, {int(row[category])}", axis=1),
-            hoverinfo='text'
-        ))
+    fig.add_trace(go.Bar(
+        x=daily_posts['Day'],
+        y=daily_posts['Counts'],
+        marker_color=px.colors.qualitative.Plotly[0]
+    ))
 
     # Update layout for better readability
     fig.update_layout(
@@ -132,7 +179,6 @@ def posts_by_day(df):
             titlefont=dict(size=16),
             tickfont=dict(size=16),
         ),
-        barmode='stack',
         template="plotly_dark",
         margin=dict(t=50, b=50),
         height=400
@@ -149,31 +195,18 @@ def posts_by_time_period(df):
     df['Week'] = df['Post Date'].dt.isocalendar().week
     df['Year'] = df['Post Date'].dt.year
     weekly_posts = df.groupby(
-        ['Year', 'Week', 'Category']).size().reset_index(name='Counts')
-    weekly_posts['Week_Start_Date'] = weekly_posts.apply(
-        lambda row: datetime.strptime(f'{row.Year}-W{row.Week}-1', "%Y-W%W-%w"), axis=1)
+        ['Year', 'Week'], as_index=False).agg({'Category': 'count'}).rename(columns={'Category': 'Counts'})
 
     st.markdown("<h3 style='text-align: center;'>Posts by Week</h3>",
                 unsafe_allow_html=True)
 
-    # Create a pivot table for stacked bar chart
-    weekly_pivot = weekly_posts.pivot(
-        index=['Year', 'Week', 'Week_Start_Date'], columns='Category', values='Counts').fillna(0)
-    weekly_pivot.reset_index(inplace=True)
-
-    # Create Plotly figure for stacked bar chart
+    # Create Plotly figure for bar chart
     fig = go.Figure()
-    color_sequence = px.colors.qualitative.Plotly
-    for i, category in enumerate(weekly_pivot.columns[3:]):
-        fig.add_trace(go.Bar(
-            x=weekly_pivot['Week'],
-            y=weekly_pivot[category],
-            name=category,
-            marker_color=color_sequence[i % len(color_sequence)],
-            hovertext=weekly_pivot.apply(
-                lambda row: f"w/c {row['Week_Start_Date'].strftime('%d %b %Y')}, {int(row[category])}", axis=1),
-            hoverinfo='text'
-        ))
+    fig.add_trace(go.Bar(
+        x=weekly_posts['Week'],
+        y=weekly_posts['Counts'],
+        marker_color=px.colors.qualitative.Plotly[1]
+    ))
 
     # Update layout for better readability
     fig.update_layout(
@@ -186,7 +219,6 @@ def posts_by_time_period(df):
             titlefont=dict(size=16),
             tickfont=dict(size=16),
         ),
-        barmode='stack',
         template="plotly_dark",
         margin=dict(t=50, b=50),
         height=400
@@ -196,8 +228,8 @@ def posts_by_time_period(df):
     st.plotly_chart(fig)
     st.markdown("</div>", unsafe_allow_html=True)
 
-
 # Top Performing Posts
+
 
 def top_performing_posts(df):
     df['Total Engagement'] = df['Likes'].astype(
@@ -220,8 +252,8 @@ def top_performing_posts(df):
         top_posts_excluding_owner = df[df['Name'] != community_owner].sort_values(
             by='Total Engagement', ascending=False).head(10)
         top_5_posts_excluding_owner = top_posts_excluding_owner.head(5)
-        st.markdown("<h3 style='text-align: center;'>Top 5 Performing Posts by Total Engagement (Excluding Community Owner)</h3>",
-                    unsafe_allow_html=True)
+        st.markdown(
+            "<h3 style='text-align: center;'>Top 5 Performing Posts by Total Engagement (Excluding Community Owner)</h3>", unsafe_allow_html=True)
         st.table(top_5_posts_excluding_owner[[
                  'Name', 'Title', 'Likes', 'Comments', 'Total Engagement']])
 
@@ -253,12 +285,11 @@ def posts_by_category(df):
     st.plotly_chart(fig)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Add Pie Chart for Posts by Owner vs Members (move this below Posts by Category)
+# Add Pie Chart for Posts by Owner vs Members
 
 
 def posts_by_owner_vs_members(df):
-    st.markdown("<div class='chart-container'><h3 style='text-align: center;'>Posts by Owner vs Members</h3></div>",
-                unsafe_allow_html=True)
+    st.markdown("<div class='chart-container'><h3 style='text-align: center;'>Posts by Owner vs Members</h3></div>", unsafe_allow_html=True)
 
     owner_name = st.sidebar.text_input(
         "Enter Community Owner Name for Pie Chart:")
@@ -277,8 +308,7 @@ def posts_by_owner_vs_members(df):
 
                 # Create and display the pie chart
                 pie_fig = px.pie(pie_data, values='Count', names='User Type',
-                                 color_discrete_sequence=px.colors.qualitative.Plotly,
-                                 title='Share of Posts by Owner vs Members')
+                                 color_discrete_sequence=px.colors.qualitative.Plotly, title='Share of Posts by Owner vs Members')
                 pie_fig.update_traces(
                     textposition='inside',
                     textinfo='percent+label',
@@ -322,7 +352,7 @@ def users_engagement_leaderboard(df, metric='Posts'):
     # Display leaderboard in the same format as previously with profile pictures
     st.write("<style>"
              "table {width: 100%; border-collapse: collapse;}"
-             "th, td {border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 16px;}"
+             "th, td {border: 1px solid #444; padding: 8px; text-align: center; font-size: 14px;}"
              "th {background-color: #444; color: white; height: 40px; text-align: center;}"
              "td img {width: 25px; height: 25px; border-radius: 50%;}"
              "th.rank, td.rank {width: 60px;}"
@@ -344,8 +374,9 @@ def users_engagement_leaderboard(df, metric='Posts'):
                  f"</tr>", unsafe_allow_html=True)
     st.write("</tbody></table></div>", unsafe_allow_html=True)
 
-
 # Run Analysis in Streamlit
+
+
 st.markdown("<div class='full-page'>", unsafe_allow_html=True)
 
 # Charts and Headers - Page 1
@@ -411,7 +442,5 @@ with col4:
                 unsafe_allow_html=True)
     users_engagement_leaderboard(df, metric='Total Engagement')
     st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
