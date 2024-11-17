@@ -447,7 +447,6 @@ st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5p
 # Comments and Total Engagement leaderboards side by side
 col3, col4 = st.columns(2)
 
-
 with col3:
     st.markdown("<h4 class='leaderboard-header' style='text-align: center;'>Comments</h4>",
                 unsafe_allow_html=True)
@@ -467,4 +466,4 @@ with col4:
 # Add call to action for actionable insights
 st.markdown("<div class='full-page' style='margin-top: 20px; text-align: center;'><p style='font-size: 18px;'>For more actionable insights for your Skool community, join Skool Reporting 👇</p><a href='https://www.skool.com/skool-reporting-1886/about' target='_blank' style='font-size: 18px;'>https://www.skool.com/skool-reporting-1886/about</a></div>", unsafe_allow_html=True)
 
-st.markdown("</div>", unsafe_allow_html=True)
+# Removed the final st.markdown("</div>", unsafe_allow_html=True) to avoid blank page
