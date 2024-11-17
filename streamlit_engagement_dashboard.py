@@ -438,7 +438,7 @@ with col2:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Add headers again for page 5
-st.markdown("<div class='full-page' style='page-break-before: always; page-break-inside: avoid;'>",
+st.markdown("<div style='page-break-before: always; page-break-inside: avoid;'>",
             unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
@@ -451,18 +451,17 @@ col3, col4 = st.columns(2)
 with col3:
     st.markdown("<h4 class='leaderboard-header' style='text-align: center;'>Comments</h4>",
                 unsafe_allow_html=True)
-    st.markdown("<div class='leaderboard-table no-page-break'>",
-                unsafe_allow_html=True)
+    st.markdown("<div class='leaderboard-table'>", unsafe_allow_html=True)
     users_engagement_leaderboard(df, metric='Comments')
     st.markdown("</div>", unsafe_allow_html=True)
 
 with col4:
     st.markdown("<h4 class='leaderboard-header' style='text-align: center;'>Total Engagement</h4>",
                 unsafe_allow_html=True)
-    st.markdown("<div class='leaderboard-table no-page-break'>",
-                unsafe_allow_html=True)
+    st.markdown("<div class='leaderboard-table'>", unsafe_allow_html=True)
     users_engagement_leaderboard(df, metric='Total Engagement')
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Add call to action for actionable insights
-st.markdown("<div style='margin-top: 20px; text-align: center;'><p style='font-size: 18px;'>For more actionable insights for your Skool community, join Skool Reporting 👇</p><a href='https://www.skool.com/skool-reporting-1886/about' target='_blank' style='font-size: 18px;'>https://www.skool.com/skool-reporting-1886/about</a></div>", unsafe_allow_html=True)
+st.markdown("<p style='margin-top: 20px; text-align: center; font-size: 18px;'>For more actionable insights for your Skool community, join Skool Reporting 👇</p>", unsafe_allow_html=True)
+st.markdown("<a href='https://www.skool.com/skool-reporting-1886/about' target='_blank' style='text-align: center; display: block; font-size: 18px;'>https://www.skool.com/skool-reporting-1886/about</a>", unsafe_allow_html=True)
