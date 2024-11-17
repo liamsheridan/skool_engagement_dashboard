@@ -437,35 +437,33 @@ with col2:
     users_engagement_leaderboard(df, metric='Likes')
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Add headers again for page 5
-st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
+# Add headers again for page 5 with reduced margin to fit content better
+st.markdown("<h2 style='text-align: center; margin-bottom: 2px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5px;'>Top 20 Members by</h3>",
+st.markdown("<h3 style='text-align: center; margin-top: -5px; margin-bottom: 2px;'>Top 20 Members by</h3>",
             unsafe_allow_html=True)
 
 # Comments and Total Engagement leaderboards side by side
 col3, col4 = st.columns(2)
 
 with col3:
-    st.markdown("<h4 class='leaderboard-header' style='text-align: center;'>Comments</h4>",
-                unsafe_allow_html=True)
+    st.markdown("<h4 class='leaderboard-header' style='text-align: center; margin-top: -5px; margin-bottom: 2px;'>Comments</h4>", unsafe_allow_html=True)
     st.markdown("<div class='leaderboard-table'>", unsafe_allow_html=True)
     users_engagement_leaderboard(df, metric='Comments')
     st.markdown("</div>", unsafe_allow_html=True)
 
 with col4:
-    st.markdown("<h4 class='leaderboard-header' style='text-align: center;'>Total Engagement</h4>",
-                unsafe_allow_html=True)
+    st.markdown("<h4 class='leaderboard-header' style='text-align: center; margin-top: -5px; margin-bottom: 2px;'>Total Engagement</h4>", unsafe_allow_html=True)
     st.markdown("<div class='leaderboard-table'>", unsafe_allow_html=True)
     users_engagement_leaderboard(df, metric='Total Engagement')
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Add call to action for actionable insights (keep it simple and remove unnecessary divs)
+# Add call to action for actionable insights with reduced top margin
 st.markdown("""
-    <p style='margin-top: 20px; text-align: center; font-size: 18px;'>
+    <p style='margin-top: 10px; text-align: center; font-size: 16px;'>
         For more actionable insights for your Skool community, join Skool Reporting 👇
     </p>
-    <p style='text-align: center; font-size: 18px;'>
+    <p style='text-align: center; font-size: 16px;'>
         <a href='https://www.skool.com/skool-reporting-1886/about' target='_blank'>
             https://www.skool.com/skool-reporting-1886/about
         </a>
