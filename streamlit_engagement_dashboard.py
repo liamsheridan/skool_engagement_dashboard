@@ -438,8 +438,6 @@ with col2:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Add headers again for page 5
-st.markdown("<div style='page-break-before: always; page-break-inside: avoid;'>",
-            unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5px;'>Top 20 Members by</h3>",
@@ -462,10 +460,14 @@ with col4:
     users_engagement_leaderboard(df, metric='Total Engagement')
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Add call to action for actionable insights (combined into one div for proper alignment)
+# Add call to action for actionable insights (keep it simple and remove unnecessary divs)
 st.markdown("""
-    <div style='margin-top: 20px; text-align: center; font-size: 18px;'>
-        <p>For more actionable insights for your Skool community, join Skool Reporting 👇</p>
-        <a href='https://www.skool.com/skool-reporting-1886/about' target='_blank'>https://www.skool.com/skool-reporting-1886/about</a>
-    </div>
+    <p style='margin-top: 20px; text-align: center; font-size: 18px;'>
+        For more actionable insights for your Skool community, join Skool Reporting 👇
+    </p>
+    <p style='text-align: center; font-size: 18px;'>
+        <a href='https://www.skool.com/skool-reporting-1886/about' target='_blank'>
+            https://www.skool.com/skool-reporting-1886/about
+        </a>
+    </p>
 """, unsafe_allow_html=True)
