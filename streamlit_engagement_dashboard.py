@@ -73,7 +73,7 @@ st.markdown("""
             font-weight: bold;
             font-size: 22px;
             margin-bottom: 5px;
-            margin-top: 30px;
+            margin-top: 15px;
         }
         h3 {
             text-align: center;
@@ -83,7 +83,7 @@ st.markdown("""
         }
         h4.leaderboard-header {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 10px;
             margin-bottom: 10px;
             font-weight: bold;
             font-size: 16px;
@@ -96,7 +96,7 @@ st.markdown("""
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         th, td {
             border: 1px solid #444;
