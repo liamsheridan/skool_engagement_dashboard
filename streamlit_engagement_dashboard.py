@@ -407,7 +407,7 @@ posts_by_owner_vs_members(df)
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Top Performing Posts - Page 3
-st.markdown("<div class='page-break full-page'>", unsafe_allow_html=True)
+st.markdown("<div class='full-page'>", unsafe_allow_html=True)
 top_performing_posts(df)
 st.markdown("</div>", unsafe_allow_html=True)
 
