@@ -94,7 +94,6 @@ else:
 
 # Posts by Day
 
-
 def posts_by_day(df):
     df['Day'] = df['Post Date'].dt.date
     daily_posts = df.groupby(
@@ -200,7 +199,6 @@ def posts_by_time_period(df):
 
 # Top Performing Posts
 
-
 def top_performing_posts(df):
     df['Total Engagement'] = df['Likes'].astype(
         int) + df['Comments'].astype(int)
@@ -255,44 +253,47 @@ def posts_by_category(df):
     st.plotly_chart(fig)
     st.markdown("</div>", unsafe_allow_html=True)
 
-
 # Add Pie Chart for Posts by Owner vs Members (move this below Posts by Category)
-st.markdown("<div class='chart-container'><h3 style='text-align: center;'>Posts by Owner vs Members</h3></div>",
-            unsafe_allow_html=True)
 
-owner_name = st.sidebar.text_input("Enter Community Owner Name for Pie Chart:")
-if owner_name and df is not None:
-    try:
-        # Check if the 'Name' column exists
-        if 'Name' in df.columns:
-            owner_posts_count = df[df['Name'] == owner_name].shape[0]
-            members_posts_count = df[df['Name'] != owner_name].shape[0]
 
-            # Create data for the pie chart
-            pie_data = pd.DataFrame({
-                'User Type': ['Owner', 'Members'],
-                'Count': [owner_posts_count, members_posts_count]
-            })
+def posts_by_owner_vs_members(df):
+    st.markdown("<div class='chart-container'><h3 style='text-align: center;'>Posts by Owner vs Members</h3></div>",
+                unsafe_allow_html=True)
 
-            # Create and display the pie chart
-            pie_fig = px.pie(pie_data, values='Count', names='User Type',
-                             color_discrete_sequence=px.colors.qualitative.Plotly,
-                             title='Share of Posts by Owner vs Members')
-            pie_fig.update_traces(
-                textposition='inside',
-                textinfo='percent+label',
-                textfont_size=18,  # Make percentage text bigger
-                textfont_color='white'  # Set text color to white
-            )
-            pie_fig.update_layout(showlegend=False)  # Remove the legend
-            st.plotly_chart(pie_fig)
-        else:
-            st.error("The required column 'Name' does not exist in the data.")
-    except Exception as e:
-        st.error(f"An error occurred while generating the pie chart: {e}")
-else:
-    st.warning(
-        "Please enter a valid community owner name and ensure a CSV file is uploaded.")
+    owner_name = st.sidebar.text_input(
+        "Enter Community Owner Name for Pie Chart:")
+    if owner_name and df is not None:
+        try:
+            # Check if the 'Name' column exists
+            if 'Name' in df.columns:
+                owner_posts_count = df[df['Name'] == owner_name].shape[0]
+                members_posts_count = df[df['Name'] != owner_name].shape[0]
+
+                # Create data for the pie chart
+                pie_data = pd.DataFrame({
+                    'User Type': ['Owner', 'Members'],
+                    'Count': [owner_posts_count, members_posts_count]
+                })
+
+                # Create and display the pie chart
+                pie_fig = px.pie(pie_data, values='Count', names='User Type',
+                                 color_discrete_sequence=px.colors.qualitative.Plotly,
+                                 title='Share of Posts by Owner vs Members')
+                pie_fig.update_traces(
+                    textposition='inside',
+                    textinfo='percent+label',
+                    textfont_size=18,  # Make percentage text bigger
+                    textfont_color='white'  # Set text color to white
+                )
+                pie_fig.update_layout(showlegend=False)  # Remove the legend
+                st.plotly_chart(pie_fig)
+            else:
+                st.error("The required column 'Name' does not exist in the data.")
+        except Exception as e:
+            st.error(f"An error occurred while generating the pie chart: {e}")
+    else:
+        st.warning(
+            "Please enter a valid community owner name and ensure a CSV file is uploaded.")
 
 # Users Engagement Leaderboard
 
@@ -352,6 +353,7 @@ st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
 posts_by_day(df)
 posts_by_time_period(df)
 posts_by_category(df)
+posts_by_owner_vs_members(df)
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Top Performing Posts - Page 2
