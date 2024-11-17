@@ -438,7 +438,7 @@ with col2:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Add headers again for page 5
-st.markdown("<div class='full-page'>", unsafe_allow_html=True)
+st.markdown("<div class='full-page' style='page-break-before: always; page-break-after: avoid; page-break-inside: avoid;'>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5px;'>Top 20 Members by</h3>",
@@ -446,6 +446,7 @@ st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5p
 
 # Comments and Total Engagement leaderboards side by side
 col3, col4 = st.columns(2)
+
 
 with col3:
     st.markdown("<h4 class='leaderboard-header' style='text-align: center;'>Comments</h4>",
