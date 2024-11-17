@@ -462,6 +462,10 @@ with col4:
     users_engagement_leaderboard(df, metric='Total Engagement')
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Add call to action for actionable insights
-st.markdown("<p style='margin-top: 20px; text-align: center; font-size: 18px;'>For more actionable insights for your Skool community, join Skool Reporting 👇</p>", unsafe_allow_html=True)
-st.markdown("<a href='https://www.skool.com/skool-reporting-1886/about' target='_blank' style='text-align: center; display: block; font-size: 18px;'>https://www.skool.com/skool-reporting-1886/about</a>", unsafe_allow_html=True)
+# Add call to action for actionable insights (combined into one div for proper alignment)
+st.markdown("""
+    <div style='margin-top: 20px; text-align: center; font-size: 18px;'>
+        <p>For more actionable insights for your Skool community, join Skool Reporting 👇</p>
+        <a href='https://www.skool.com/skool-reporting-1886/about' target='_blank'>https://www.skool.com/skool-reporting-1886/about</a>
+    </div>
+""", unsafe_allow_html=True)
