@@ -227,11 +227,6 @@ def scrape_community_posts(driver, community_url):
             current_post_elements = driver.find_elements(
                 By.XPATH, "//div[contains(@class, 'styled__PostItemWrapper-sc-e4ns84-7')]"
             )
-            current_post_count = len(current_post_elements)
-
-            if current_post_count == previous_post_count:
-                print("No new posts were loaded. Stopping to avoid infinite loop.")
-                break
 
         # Log collected data to check if data is collected
         print(f"Collected {len(posts_data)} posts.")

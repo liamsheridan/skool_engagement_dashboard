@@ -58,7 +58,7 @@ st.markdown("""
 
 
 # Streamlit App
-st.markdown("<h1 style='text-align: center; margin-bottom: -10px;'>Skool Community Analysis Dashboard</h1>",
+st.markdown("<h1 style='text-align: center; margin-bottom: -10px;'>Skool Community Post Engagement Dashboard</h1>",
             unsafe_allow_html=True)
 
 
