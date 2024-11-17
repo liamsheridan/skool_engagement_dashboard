@@ -156,29 +156,36 @@ else:
 def posts_by_day(df):
     df['Day'] = df['Post Date'].dt.date
     daily_posts = df.groupby(
-        ['Day'], as_index=False).agg({'Category': 'count'}).rename(columns={'Category': 'Counts'})
+        ['Day', 'Category']).size().reset_index(name='Counts')
+
     st.markdown("<h3 style='text-align: center;'>Posts by Day</h3>",
                 unsafe_allow_html=True)
 
     # Create a pivot table for stacked bar chart
+    daily_pivot = daily_posts.pivot(
+        index='Day', columns='Category', values='Counts').fillna(0)
+    daily_pivot.reset_index(inplace=True)
+
+    # Create Plotly figure for stacked bar chart
     fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=daily_posts['Day'],
-        y=daily_posts['Counts'],
-        marker_color=px.colors.qualitative.Plotly[0]
-    ))
+    color_sequence = px.colors.qualitative.Plotly
+    for i, category in enumerate(daily_pivot.columns[1:]):
+        fig.add_trace(go.Bar(
+            x=daily_pivot['Day'],
+            y=daily_pivot[category],
+            name=category,
+            marker_color=color_sequence[i % len(color_sequence)],
+            hovertext=daily_pivot.apply(lambda row: f"{row['Day']}, {
+                                        int(row[category])}", axis=1),
+            hoverinfo='text'
+        ))
 
     # Update layout for better readability
     fig.update_layout(
-        xaxis=dict(
-            title="Day",
-            tickfont=dict(size=16)
-        ),
-        yaxis=dict(
-            title="Number of Posts",
-            titlefont=dict(size=16),
-            tickfont=dict(size=16),
-        ),
+        xaxis=dict(title="Day", tickfont=dict(size=16)),
+        yaxis=dict(title="Number of Posts", titlefont=dict(
+            size=16), tickfont=dict(size=16)),
+        barmode='stack',
         template="plotly_dark",
         margin=dict(t=50, b=50),
         height=400
@@ -195,30 +202,39 @@ def posts_by_time_period(df):
     df['Week'] = df['Post Date'].dt.isocalendar().week
     df['Year'] = df['Post Date'].dt.year
     weekly_posts = df.groupby(
-        ['Year', 'Week'], as_index=False).agg({'Category': 'count'}).rename(columns={'Category': 'Counts'})
+        ['Year', 'Week', 'Category']).size().reset_index(name='Counts')
+    weekly_posts['Week_Start_Date'] = weekly_posts.apply(
+        lambda row: datetime.strptime(f'{row.Year}-W{row.Week}-1', "%Y-W%W-%w"), axis=1
+    )
 
     st.markdown("<h3 style='text-align: center;'>Posts by Week</h3>",
                 unsafe_allow_html=True)
 
-    # Create Plotly figure for bar chart
+    # Create a pivot table for stacked bar chart
+    weekly_pivot = weekly_posts.pivot(
+        index=['Year', 'Week', 'Week_Start_Date'], columns='Category', values='Counts').fillna(0)
+    weekly_pivot.reset_index(inplace=True)
+
+    # Create Plotly figure for stacked bar chart
     fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=weekly_posts['Week'],
-        y=weekly_posts['Counts'],
-        marker_color=px.colors.qualitative.Plotly[1]
-    ))
+    color_sequence = px.colors.qualitative.Plotly
+    for i, category in enumerate(weekly_pivot.columns[3:]):
+        fig.add_trace(go.Bar(
+            x=weekly_pivot['Week'],
+            y=weekly_pivot[category],
+            name=category,
+            marker_color=color_sequence[i % len(color_sequence)],
+            hovertext=weekly_pivot.apply(
+                lambda row: f"w/c {row['Week_Start_Date'].strftime('%d %b %Y')}, {int(row[category])}", axis=1),
+            hoverinfo='text'
+        ))
 
     # Update layout for better readability
     fig.update_layout(
-        xaxis=dict(
-            title="Week",
-            tickfont=dict(size=16)
-        ),
-        yaxis=dict(
-            title="Number of Posts",
-            titlefont=dict(size=16),
-            tickfont=dict(size=16),
-        ),
+        xaxis=dict(title="Week", tickfont=dict(size=16)),
+        yaxis=dict(title="Number of Posts", titlefont=dict(
+            size=16), tickfont=dict(size=16)),
+        barmode='stack',
         template="plotly_dark",
         margin=dict(t=50, b=50),
         height=400
@@ -227,6 +243,7 @@ def posts_by_time_period(df):
     st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
     st.plotly_chart(fig)
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 # Top Performing Posts
 
