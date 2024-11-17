@@ -4,42 +4,28 @@ import streamlit as st
 import plotly.graph_objects as go
 import openpyxl
 from datetime import datetime, timedelta
-from skool_community_posts import scrape_community_data
-from io import BytesIO
 import os
 from PIL import Image
 import matplotlib.pyplot as plt
 
-# Input fields for scraping new data
-st.sidebar.subheader("Scrape New Community Data")
-community_url = st.sidebar.text_input("Enter Community URL:")
-community_owner = st.sidebar.text_input(
-    "Enter Community Owner Name:", key='community_owner')
+# Input fields for uploading new data
+st.sidebar.subheader("Upload Community Data CSV")
+uploaded_file = st.sidebar.file_uploader("Upload CSV File", type="csv")
 
-# Updated to work with BytesIO data returned from scraper
-if st.sidebar.button("Scrape Data"):
-    if community_url and community_owner:
-        with st.spinner("Scraping data, please wait..."):
-            scraped_data = scrape_community_data(
-                community_url, community_owner)
-            if scraped_data:
-                df = pd.read_csv(scraped_data)
-                st.success("Data scraping completed successfully.")
-            else:
-                st.error("Data scraping failed or no data was collected.")
-                df = None
-    else:
-        st.error("Please enter both Community URL and Community Owner Name.")
-        df = None
+if uploaded_file is not None:
+    # Extract community identifier from file name for dynamic URL
+    community_identifier = uploaded_file.name.split('.')[0]
+    st.experimental_set_query_params(community=community_identifier)
+    with st.spinner("Loading data, please wait..."):
+        try:
+            df = pd.read_csv(uploaded_file)
+            st.success("Data loaded successfully.")
+        except Exception as e:
+            st.error(f"Error reading CSV file: {e}")
+            df = None
 else:
-    # Load data from CSV file
-    try:
-        df = pd.read_csv("community_posts.csv")
-    except FileNotFoundError:
-        st.error(
-            "CSV file not found. Please ensure the scraping script has run successfully."
-        )
-        df = None
+    st.error("Please upload a CSV file to proceed.")
+    df = None
 
 # Only proceed if df is defined
 if df is not None:
@@ -72,7 +58,7 @@ st.markdown("""
 
 
 # Streamlit App
-st.markdown("<h1 style='text-align: center; margin-bottom: -10px;'>Skool Community Analysis Dashboard</h1>",
+st.markdown("<h1 style='text-align: center; margin-bottom: -10px;'>Skool Community Post Engagement Dashboard</h1>",
             unsafe_allow_html=True)
 
 
@@ -167,57 +153,6 @@ def posts_by_time_period(df):
     st.plotly_chart(fig)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Posts by Day
-
-
-def posts_by_day(df):
-    df['Day'] = df['Post Date'].dt.date
-    daily_posts = df.groupby(
-        ['Day', 'Category']).size().reset_index(name='Counts')
-
-    st.markdown("<h3 style='text-align: center;'>Posts by Day</h3>",
-                unsafe_allow_html=True)
-
-    # Create a pivot table for stacked bar chart
-    daily_pivot = daily_posts.pivot(
-        index='Day', columns='Category', values='Counts').fillna(0)
-    daily_pivot.reset_index(inplace=True)
-
-    # Create Plotly figure for stacked bar chart
-    fig = go.Figure()
-    color_sequence = px.colors.qualitative.Plotly
-    for i, category in enumerate(daily_pivot.columns[1:]):
-        fig.add_trace(go.Bar(
-            x=daily_pivot['Day'],
-            y=daily_pivot[category],
-            name=category,
-            marker_color=color_sequence[i % len(color_sequence)],
-            hovertext=daily_pivot.apply(
-                lambda row: f"{row['Day'].strftime('%d %b %Y')}, {int(row[category])}", axis=1),
-            hoverinfo='text'
-        ))
-
-    # Update layout for better readability
-    fig.update_layout(
-        xaxis=dict(
-            title="Day",
-            tickfont=dict(size=16)
-        ),
-        yaxis=dict(
-            title="Number of Posts",
-            titlefont=dict(size=16),
-            tickfont=dict(size=16),
-        ),
-        barmode='stack',
-        template="plotly_dark",
-        margin=dict(t=50, b=50),
-        height=400
-    )
-
-    st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
-    st.plotly_chart(fig)
-    st.markdown("</div>", unsafe_allow_html=True)
-
 # Top Performing Posts
 
 
@@ -236,13 +171,16 @@ def top_performing_posts(df):
              'Comments', 'Total Engagement']])
 
     # Top 5 Performing Posts by Total Engagement (Excluding Community Owner)
-    top_posts_excluding_owner = df[df['Name'] != community_owner].sort_values(
-        by='Total Engagement', ascending=False).head(10)
-    top_5_posts_excluding_owner = top_posts_excluding_owner.head(5)
-    st.markdown("<h3 style='text-align: center;'>Top 5 Performing Posts by Total Engagement (Excluding Community Owner)</h3>",
-                unsafe_allow_html=True)
-    st.table(top_5_posts_excluding_owner[[
-             'Name', 'Title', 'Likes', 'Comments', 'Total Engagement']])
+    community_owner = st.sidebar.text_input(
+        "Enter Community Owner Name to Exclude:")
+    if community_owner:
+        top_posts_excluding_owner = df[df['Name'] != community_owner].sort_values(
+            by='Total Engagement', ascending=False).head(10)
+        top_5_posts_excluding_owner = top_posts_excluding_owner.head(5)
+        st.markdown("<h3 style='text-align: center;'>Top 5 Performing Posts by Total Engagement (Excluding Community Owner)</h3>",
+                    unsafe_allow_html=True)
+        st.table(top_5_posts_excluding_owner[[
+                 'Name', 'Title', 'Likes', 'Comments', 'Total Engagement']])
 
 # Posts by Category
 
@@ -329,7 +267,6 @@ st.markdown("<div class='full-page'>", unsafe_allow_html=True)
 # Charts and Headers - Page 1
 st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
 posts_by_time_period(df)
-posts_by_day(df)
 posts_by_category(df)
 st.markdown("</div>", unsafe_allow_html=True)
 
