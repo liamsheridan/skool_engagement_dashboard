@@ -412,7 +412,7 @@ top_performing_posts(df)
 st.markdown("</div>", unsafe_allow_html=True)
 
 # User Engagement Leaderboards - Page 4
-st.markdown("<div class='page-break full-page'>", unsafe_allow_html=True)
+st.markdown("<div style='page-break-inside: avoid;'>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5px;'>Top 20 Members by</h3>",
@@ -424,22 +424,22 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown("<h4 class='leaderboard-header' style='text-align: center;'>Posts</h4>",
                 unsafe_allow_html=True)
-    st.markdown("<div class='leaderboard-table no-page-break'>",
-                unsafe_allow_html=True)
+    st.markdown("<div class='leaderboard-table'>", unsafe_allow_html=True)
     users_engagement_leaderboard(df, metric='Posts')
     st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
     st.markdown("<h4 class='leaderboard-header' style='text-align: center;'>Likes</h4>",
                 unsafe_allow_html=True)
-    st.markdown("<div class='leaderboard-table no-page-break'>",
-                unsafe_allow_html=True)
+    st.markdown("<div class='leaderboard-table'>", unsafe_allow_html=True)
     users_engagement_leaderboard(df, metric='Likes')
     st.markdown("</div>", unsafe_allow_html=True)
 
+# Close page-break-inside: avoid div
+st.markdown("</div>", unsafe_allow_html=True)
+
 # Add headers again for page 5 with reduced margin to fit content better
-st.markdown("<div style='page-break-before: always; page-break-inside: avoid;'>",
-            unsafe_allow_html=True)
+st.markdown("<div style='page-break-inside: avoid;'>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; margin-bottom: 2px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; margin-top: -5px; margin-bottom: 2px;'>Top 20 Members by</h3>",
@@ -459,6 +459,9 @@ with col4:
     st.markdown("<div class='leaderboard-table'>", unsafe_allow_html=True)
     users_engagement_leaderboard(df, metric='Total Engagement')
     st.markdown("</div>", unsafe_allow_html=True)
+
+# Close page-break-inside: avoid div
+st.markdown("</div>", unsafe_allow_html=True)
 
 # Add call to action for actionable insights with reduced top margin
 st.markdown("""
