@@ -19,7 +19,6 @@ if uploaded_file is not None:
     with st.spinner("Loading data, please wait..."):
         try:
             df = pd.read_csv(uploaded_file)
-            st.success("Data loaded successfully.")
         except Exception as e:
             st.error(f"Error reading CSV file: {e}")
             df = None
