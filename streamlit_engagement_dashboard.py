@@ -438,7 +438,8 @@ with col2:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Add headers again for page 5
-st.markdown("<div class='full-page' style='page-break-before: always; page-break-after: avoid; page-break-inside: avoid;'>", unsafe_allow_html=True)
+st.markdown("<div class='full-page' style='page-break-before: always; page-break-inside: avoid;'>",
+            unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5px;'>Top 20 Members by</h3>",
@@ -464,6 +465,4 @@ with col4:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Add call to action for actionable insights
-st.markdown("<div class='full-page' style='margin-top: 20px; text-align: center;'><p style='font-size: 18px;'>For more actionable insights for your Skool community, join Skool Reporting 👇</p><a href='https://www.skool.com/skool-reporting-1886/about' target='_blank' style='font-size: 18px;'>https://www.skool.com/skool-reporting-1886/about</a></div>", unsafe_allow_html=True)
-
-# Removed the final st.markdown("</div>", unsafe_allow_html=True) to avoid blank page
+st.markdown("<div style='margin-top: 20px; text-align: center;'><p style='font-size: 18px;'>For more actionable insights for your Skool community, join Skool Reporting 👇</p><a href='https://www.skool.com/skool-reporting-1886/about' target='_blank' style='font-size: 18px;'>https://www.skool.com/skool-reporting-1886/about</a></div>", unsafe_allow_html=True)
