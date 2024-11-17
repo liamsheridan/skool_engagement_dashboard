@@ -198,7 +198,7 @@ def posts_by_time_period(df):
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-# Add Pie Chart for Posts by Owner vs Members
+# Add Pie Chart for Posts by Owner vs Members (move this below Posts by Category)
 st.markdown("<div class='chart-container'><h3 style='text-align: center;'>Posts by Owner vs Members</h3></div>",
             unsafe_allow_html=True)
 
@@ -226,6 +226,7 @@ if owner_name and df is not None:
                 textfont_size=18,  # Make percentage text bigger
                 textfont_color='white'  # Set text color to white
             )
+            pie_fig.update_layout(showlegend=False)  # Remove the legend
             st.plotly_chart(pie_fig)
         else:
             st.error("The required column 'Name' does not exist in the data.")
