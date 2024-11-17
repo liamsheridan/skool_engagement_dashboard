@@ -412,7 +412,8 @@ top_performing_posts(df)
 st.markdown("</div>", unsafe_allow_html=True)
 
 # User Engagement Leaderboards - Page 4
-st.markdown("<div style='page-break-inside: avoid;'>", unsafe_allow_html=True)
+st.markdown("<div style='page-break-before: always; page-break-inside: avoid;'>",
+            unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5px;'>Top 20 Members by</h3>",
@@ -439,7 +440,8 @@ with col2:
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Add headers again for page 5 with reduced margin to fit content better
-st.markdown("<div style='page-break-inside: avoid;'>", unsafe_allow_html=True)
+st.markdown("<div style='page-break-before: always; page-break-inside: avoid;'>",
+            unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; margin-bottom: 2px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; margin-top: -5px; margin-bottom: 2px;'>Top 20 Members by</h3>",
