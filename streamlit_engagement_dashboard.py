@@ -48,7 +48,7 @@ st.markdown("""
                 page-break-inside: avoid;
                 page-break-before: auto;
                 page-break-after: auto;
-                margin-bottom: 40px; /* Add some extra spacing for printing */
+                margin-bottom: 20px; /* Reduced spacing for printing */
             }
             body {
                 -webkit-print-color-adjust: exact;
@@ -63,7 +63,7 @@ st.markdown("""
             font-family: Arial, sans-serif;
         }
         h1 {
-            margin-bottom: 10px !important;
+            margin-bottom: 0px !important;
             text-align: center;
             font-weight: bold;
             font-size: 28px; /* Larger font for main title */
@@ -73,7 +73,7 @@ st.markdown("""
             font-weight: bold;
             font-size: 22px;
             margin-bottom: 5px;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         h3 {
             text-align: center;
@@ -83,8 +83,8 @@ st.markdown("""
         }
         h4.leaderboard-header {
             text-align: center;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            margin-top: 5px;
+            margin-bottom: 5px;
             font-weight: bold;
             font-size: 16px;
         }
@@ -137,7 +137,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Streamlit App
-st.markdown("<h1 style='text-align: center; margin-bottom: -10px;'>Skool Community Post Engagement Dashboard</h1>",
+st.markdown("<h1 style='text-align: center; margin-bottom: 0px;'>Skool Community Post Engagement Dashboard</h1>",
             unsafe_allow_html=True)
 
 # Month Filter
@@ -246,7 +246,6 @@ def posts_by_time_period(df):
 
 # Top Performing Posts
 
-
 def top_performing_posts(df):
     df['Total Engagement'] = df['Likes'].astype(
         int) + df['Comments'].astype(int)
@@ -259,7 +258,7 @@ def top_performing_posts(df):
     st.markdown("<h3 style='text-align: center;'>Top 5 Performing Posts by Total Engagement</h3>",
                 unsafe_allow_html=True)
     st.table(top_5_posts[['Name', 'Title', 'Likes',
-             'Comments', 'Total Engagement']])
+             'Comments', 'Total Engagement']].reset_index(drop=True))
 
     # Top 5 Performing Posts by Total Engagement (Excluding Community Owner)
     community_owner = st.sidebar.text_input(
@@ -271,7 +270,7 @@ def top_performing_posts(df):
         st.markdown(
             "<h3 style='text-align: center;'>Top 5 Performing Posts by Total Engagement (Excluding Community Owner)</h3>", unsafe_allow_html=True)
         st.table(top_5_posts_excluding_owner[[
-                 'Name', 'Title', 'Likes', 'Comments', 'Total Engagement']])
+                 'Name', 'Title', 'Likes', 'Comments', 'Total Engagement']].reset_index(drop=True))
 
 # Posts by Category
 
@@ -324,7 +323,7 @@ def posts_by_owner_vs_members(df):
 
                 # Create and display the pie chart
                 pie_fig = px.pie(pie_data, values='Count', names='User Type',
-                                 color_discrete_sequence=px.colors.qualitative.Plotly, title='Share of Posts by Owner vs Members')
+                                 color_discrete_sequence=px.colors.qualitative.Plotly)
                 pie_fig.update_traces(
                     textposition='inside',
                     textinfo='percent+label',
@@ -377,7 +376,7 @@ def users_engagement_leaderboard(df, metric='Posts'):
              "th.metric, td.metric {width: 50px;}"
              "caption {font-size: 2em; margin-bottom: 10px; font-weight: bold; text-align: center;}"
              "</style>", unsafe_allow_html=True)
-    st.write("<div class='no-page-break' style='margin-top: 10px;'><table class='custom-table no-page-break'>",
+    st.write("<div class='no-page-break' style='margin-top: 5px;'><table class='custom-table no-page-break'>",
              unsafe_allow_html=True)
     st.write("<tbody>", unsafe_allow_html=True)
     for _, row in leaderboard.iterrows():
@@ -399,16 +398,20 @@ st.markdown("<div class='full-page'>", unsafe_allow_html=True)
 st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
 posts_by_day(df)
 posts_by_time_period(df)
+st.markdown("</div>", unsafe_allow_html=True)
+
+# Posts by Category and Posts by Owner vs Members - Page 2
+st.markdown("<div class='page-break full-page'>", unsafe_allow_html=True)
 posts_by_category(df)
 posts_by_owner_vs_members(df)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Top Performing Posts - Page 2
+# Top Performing Posts - Page 3
 st.markdown("<div class='page-break full-page'>", unsafe_allow_html=True)
 top_performing_posts(df)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# User Engagement Leaderboards - Page 3 and Page 4
+# User Engagement Leaderboards - Page 4
 st.markdown("<div class='page-break full-page'>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
             unsafe_allow_html=True)
@@ -417,7 +420,7 @@ st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5p
 
 col1, col2 = st.columns(2)
 
-# Posts and Likes leaderboards side by side - Page 3
+# Posts and Likes leaderboards side by side
 with col1:
     st.markdown("<h4 class='leaderboard-header' style='text-align: center;'>Posts</h4>",
                 unsafe_allow_html=True)
@@ -434,13 +437,7 @@ with col2:
     users_engagement_leaderboard(df, metric='Likes')
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Comments and Total Engagement leaderboards side by side - Page 4
-st.markdown("<div class='page-break full-page'>", unsafe_allow_html=True)
-st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>User Engagement Leaderboard</h2>",
-            unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; margin-top: -10px; margin-bottom: 5px;'>Top 20 Members by</h3>",
-            unsafe_allow_html=True)
-
+# Comments and Total Engagement leaderboards side by side
 col3, col4 = st.columns(2)
 
 with col3:
