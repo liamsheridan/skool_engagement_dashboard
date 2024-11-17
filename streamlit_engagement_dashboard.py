@@ -157,7 +157,7 @@ def posts_by_day(df):
     daily_posts = df.groupby(
         ['Day', 'Category']).size().reset_index(name='Counts')
 
-    st.markdown("<h3 style='text-align: center;'>Posts by Day</h3>",
+    st.markdown("<h2 style='text-align: center;'>Posts by Day</h2>",
                 unsafe_allow_html=True)
 
     # Create a pivot table for stacked bar chart
@@ -206,7 +206,7 @@ def posts_by_time_period(df):
         lambda row: datetime.strptime(f'{row.Year}-W{row.Week}-1', "%Y-W%W-%w"), axis=1
     )
 
-    st.markdown("<h3 style='text-align: center;'>Posts by Week</h3>",
+    st.markdown("<h2 style='text-align: center;'>Posts by Week</h2>",
                 unsafe_allow_html=True)
 
     # Create a pivot table for stacked bar chart
@@ -281,7 +281,7 @@ def posts_by_category(df):
     ).sort_values(ascending=False).reset_index()
     category_count.columns = ['Category', 'Count']
 
-    st.markdown("<div class='chart-container'><h3 style='text-align: center;'>Posts by Category</h3></div>",
+    st.markdown("<div class='chart-container'><h2 style='text-align: center;'>Posts by Category</h2></div>",
                 unsafe_allow_html=True)
 
     # Use Plotly to create a bar chart with customization and emoji support
@@ -305,7 +305,7 @@ def posts_by_category(df):
 
 
 def posts_by_owner_vs_members(df):
-    st.markdown("<div class='chart-container'><h3 style='text-align: center;'>Posts by Owner vs Members</h3></div>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-container'><h2 style='text-align: center;'>Posts by Owner vs Members</h2></div>", unsafe_allow_html=True)
 
     owner_name = st.sidebar.text_input(
         "Enter Community Owner Name for Pie Chart:")
