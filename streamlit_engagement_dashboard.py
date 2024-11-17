@@ -34,16 +34,7 @@ if df is not None:
         df['Post Date'] = pd.to_datetime(df['Post Date'], format="%d/%m/%Y")
     except Exception as e:
         st.error(f"Error converting Post Date: {e}")
-else:
-    st.stop()  # Stop execution if no valid data is available
-
-
-# Convert Post Date to datetime
-try:
-    df['Post Date'] = pd.to_datetime(df['Post Date'], format="%d/%m/%Y")
-except Exception as e:
-    st.error(f"Error converting Post Date: {e}")
-    exit()
+        st.stop()  # Stop execution if no valid data is available
 
 st.markdown("""
     <style>
@@ -56,51 +47,104 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
 # Streamlit App
 st.markdown("<h1 style='text-align: center; margin-bottom: -10px;'>Skool Community Post Engagement Dashboard</h1>",
             unsafe_allow_html=True)
 
-
 # Custom CSS for page formatting and preventing page breaks
 st.markdown("""
-    <style>
-        @media print {
-            h1, h2, h3, h4, h5, h6, p, div, table, thead, tbody, tfoot, tr, th, td {
-                page-break-inside: avoid;
+            <style>
+            @media print {
+                h1, h2, h3, h4, h5, h6, p, div, table, thead, tbody, tfoot, tr, th, td {
+                    page-break-inside: avoid;
+                }
+                .page-break {
+                    page-break-before: always;
+                }
+                .chart-container {
+                    page-break-inside: avoid;
+                    page-break-before: auto;
+                    page-break-after: auto;
+                    margin-bottom: 20px;
+                }
+                body {
+                    -webkit-print-color-adjust: exact;
+                    font-size: 16px;
+                }
             }
-            .page-break {
-                page-break-before: always;
+            .leaderboard-header {
+                margin-bottom: -10px;
+                margin-top: 0px;
             }
-            .chart-container {
-                page-break-inside: avoid;
-                page-break-before: auto;
-                page-break-after: auto;
-                margin-bottom: 20px;
+            .leaderboard-table {
+                margin-top: 0px;
             }
-            body {
-                -webkit-print-color-adjust: exact;
-                font-size: 16px;
-            }
-        }
-        .leaderboard-header {
-            margin-bottom: -100px;  /* Reduces space below the header */
-            margin-top: -10px;   /* Reduces space above the header */
-        }
-        .leaderboard-table {
-            margin-top: -100px;   /* Brings the table closer to the header */
-        }
-    </style>
-""", unsafe_allow_html=True)
+            </style>
+            """, unsafe_allow_html=True)
 
 # Month Filter
-month_filter = st.sidebar.selectbox("Select Month", options=[
-                                    'All'] + df['Post Date'].dt.strftime('%B %Y').unique().tolist())
-if month_filter != 'All':
-    df = df[df['Post Date'].dt.strftime('%B %Y') == month_filter]
+if df is not None:
+    month_filter = st.sidebar.selectbox("Select Month", options=[
+        'All'] + df['Post Date'].dt.strftime('%B %Y').unique().tolist())
+    if month_filter != 'All':
+        df = df[df['Post Date'].dt.strftime('%B %Y') == month_filter]
+else:
+    st.warning("Please upload a valid CSV file to proceed.")
 
+
+# Posts by Day
+
+
+def posts_by_day(df):
+    df['Day'] = df['Post Date'].dt.date
+    daily_posts = df.groupby(
+        ['Day', 'Category']).size().reset_index(name='Counts')
+
+    st.markdown("<h3 style='text-align: center;'>Posts by Day</h3>",
+                unsafe_allow_html=True)
+
+    # Create a pivot table for stacked bar chart
+    daily_pivot = daily_posts.pivot(
+        index=['Day'], columns='Category', values='Counts').fillna(0)
+    daily_pivot.reset_index(inplace=True)
+
+    # Create Plotly figure for stacked bar chart
+    fig = go.Figure()
+    color_sequence = px.colors.qualitative.Plotly
+    for i, category in enumerate(daily_pivot.columns[1:]):
+        fig.add_trace(go.Bar(
+            x=daily_pivot['Day'],
+            y=daily_pivot[category],
+            name=category,
+            marker_color=color_sequence[i % len(color_sequence)],
+            hovertext=daily_pivot.apply(
+                lambda row: f"{row['Day']}, {int(row[category])}", axis=1),
+            hoverinfo='text'
+        ))
+
+    # Update layout for better readability
+    fig.update_layout(
+        xaxis=dict(
+            title="Day",
+            tickfont=dict(size=16)
+        ),
+        yaxis=dict(
+            title="Number of Posts",
+            titlefont=dict(size=16),
+            tickfont=dict(size=16),
+        ),
+        barmode='stack',
+        template="plotly_dark",
+        margin=dict(t=50, b=50),
+        height=400
+    )
+
+    st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
+    st.plotly_chart(fig)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # Posts by Week
+
 
 def posts_by_time_period(df):
     df['Week'] = df['Post Date'].dt.isocalendar().week
@@ -210,8 +254,8 @@ def posts_by_category(df):
     st.plotly_chart(fig)
     st.markdown("</div>", unsafe_allow_html=True)
 
-
 # Users Engagement Leaderboard
+
 
 def users_engagement_leaderboard(df, metric='Posts'):
     if metric == "Posts":
@@ -259,13 +303,13 @@ def users_engagement_leaderboard(df, metric='Posts'):
                  f"</tr>", unsafe_allow_html=True)
     st.write("</tbody></table></div>", unsafe_allow_html=True)
 
+
 # Run Analysis in Streamlit
-
-
 st.markdown("<div class='full-page'>", unsafe_allow_html=True)
 
 # Charts and Headers - Page 1
 st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
+posts_by_day(df)
 posts_by_time_period(df)
 posts_by_category(df)
 st.markdown("</div>", unsafe_allow_html=True)
